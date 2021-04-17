@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# created by Tina
+
 if "[ $?-eq 0 ]"
 
 then 
