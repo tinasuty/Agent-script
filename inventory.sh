@@ -1,11 +1,11 @@
 #!/bin/bash
-if [ $?-eq 0 ]
+if "[ $?-eq 0 ]"
 
 then 
 
-echo [success]
+echo "[ success ]"
 
 else
-echo [ not sucessful ]
+echo "[ not sucessful ]"
 
 fi
