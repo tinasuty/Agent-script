@@ -1,0 +1,231 @@
+Varibales
+
+a variable is a string that carries a value and that value can be called many times in the script
+
+example:
+FIRST_NAME=Serge
+echo ${FIRSTNAME}  this will display the value of the variable 
+
+a= "My name is Agnes"
+
+Read statement 
+it is used in scripting to capture data from users. the data here is stored in variables and we can call those variables.
+vi#iiexample:
+
+echo "what is your name? "
+read NAME
+
+echo $NAME the value will represent what was entered at the prompt by the user.
+
+Project1: write a script that will ask users for the year of birth.if the user is less than 21 years old, it should display "Who send you here ? go home"
+and if the user is more than 21 years old it should say "welcome to our store. Please visit aisle 13 for our specials "
+
+sol:
+
+touch AgeCechk.sh
+chmod +x AgeCheck.sh
+Project2
+
+project2: write a script to check if these files ixist on a system.
+
+/etc/group
+/etc/passwd
+/etc/grub.conf
+
+touch file.sh
+chmod +x file.sh
+vi file.sh
+
+#!/bin/bash
+
+if [ -f /etc/group ]
+then
+echo "the file /etc/group exist"
+else
+echo "File missing"
+fi
+
+if [ -f /etc/passwd ]
+then
+echo "the file /etc/passwd exist"
+else 
+echo "file missing "
+fi
+
+
+if [ -f /etc/grub.conf ]
+then
+echo "the file /etc/grub.conf exist"
+else 
+echo "file is missing"
+fi
+
+NB: We can use the exit command to exit our script. 
+exit <number>
+the number represent our exit code.
+
+
+if [ condition
+then
+command
+elif [ condition ]
+then
+command 
+elif [ condition ]
+then
+command 
+else
+command
+fi
+
+&& and 
+|| or 
+
+if  [ condition1 ] && [ condition2 ]  another way [ contidion1 -a condition2 ]
+then
+command 
+fi
+
+if [ condition1 ] || [ condition2 ] another way [ condition1 -o condition2 ]
+then
+command 
+fi 
+
+Project3: On one of the servers at work, we have an application running and generating a whole lot of log messages. this is causing the server to always generate alerts about filesystem ( hard drive or partition)  been full. and when we receive the alert, someone needs to login and manually delete those logs.
+I decided to write a script that will automatically delete these logs after every 2 weeks. basically the script was going to run every two weeks and delete all the logs or files  14 days old.
+( we can use the /var/log directory for test )
+
+Project4: 
+After installing servers, we need someone to login to the new server and check few things:
+for exam the number of cpu ( should be 2 ), the total memory ( should be 2000) , the user puppet should exist , the file /etc/group, /etc/passwd, /etc/httpd , /etc/kubernetes, should exist. the first digit of the kernel version should be 3 or more. 
+if any of these parameters are met, the the script should display "cpu PASS" for example. or 
+"cpu FAILED"
+
+
+
+
+#!/bin/bash
+
+# This script will check the new install server.
+# April 2021  # By serge@gmail.com 
+#Modified by: tina@gmail.com on Jan 2022 
+
+## CPU check 
+CPU_N=`nproc`
+if [ ${CPU_N} -lt 2 ]
+then 
+echo "CPU check FAILED"
+else 
+echo "CPU check PASS"
+fi 
+## Memory check 
+MEM=`free -m |grep Mem | awk '{print$2}'`
+
+if [ ${MEM} -lt 2000 ]
+then 
+echo "Memory check FAILED"
+else 
+echo "Memory check PASS"
+fi 
+## Check files if exist
+
+if [ -f /etc/group ]
+then
+echo "File /etc/group exist"
+else 
+echo "File /etc/group missing"
+fi 
+
+if [ -f /etc/passwd ]
+then
+echo "File /etc/passwd exist"
+else
+echo "File /etc/passwd missing" 
+fi
+if [ -f /etc/httpd ]
+then
+echo "File /etc/httpd exist"
+else
+echo "File /etc/httpd missing" 
+fi
+if [ -f /etc/kubernetes ]
+then
+echo "File /etc/kubernetes exist"
+else
+echo "File /etc/kubernetes missing" 
+fi
+## Check user puppet 
+
+id puppet
+RC=$? 
+if [ ${RC} -eq 0 ]
+then
+echo "User puppet check PASS"
+else 
+echo "User puppet check FAILED "
+fi
+## Kernel version
+kernelVersion=`uname -r | awk -F "." '{print $1}'`
+
+if [ ${kernelVersion} -ge 3 ]
+then
+echo "Kernel version check PASS"
+else 
+echo "Kernel version check FAILED"
+fi 
+
+### Docker image build 
+
+#!/usr/bin/env bash
+# Jimi
+
+#LABEL script to build docker image delete docker file and directory
+
+echo "What name would you like your workspace dir to be called ?: "
+
+read ifolder
+
+mkdir ${ifolder} && cd ${ifolder} && touch dockerfile
+
+echo "What is your base OS ? centos, alpine or ubuntu ?:"
+
+read iname
+
+if [ ${iname} != centos ] || [ ${iname} != alpine ] || [ ${iname} != ubuntu ]
+then
+echo "Please enter a valid choice between centos, alpine ubuntu"
+exit 1
+fi
+
+echo "What port do you want to use ?: "
+
+read p
+
+echo "what version do you want to use ?: "
+
+read MYV
+
+if [[ ${iname} = centos ]];then
+echo -e "FROM ${iname}:${MYV}""\nMAINTAINER ${USER}""\nEXPOSE ${p}""\nRUN yum update -y" > dockerfile
+echo "Building ${iname} image."
+ elif
+ [[ ${iname} = alpine ]];then
+ echo -e "FROM ${iname}:${MYV}""\nMAINTAINER ${USER}""\nEXPOSE ${p}""\nRUN apk update" > dockerfile
+ echo "Building ${iname} image."
+  else
+  if
+  [[ ${iname} = ubuntu ]]; then
+  echo -e "FROM ${iname}:${MYV}""\nMAINTAINER ${USER}""\nRUN apt-get update -y""\nEXPOSE ${p}" > dockerfile
+  echo "Building ${iname} image."
+fi
+ fi
+
+docker image build -t ${USER}_${iname} .
+if [[ $? -eq 0 ]];
+then
+rm -f dockerfile
+cd -
+rm -r ${ifolder}
+echo -e  "${iname} image built successfully and dockerfile and directory deleted.\n Please run the docker images command to check"
+exit 0
+fi
