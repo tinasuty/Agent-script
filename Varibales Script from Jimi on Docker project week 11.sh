@@ -6,7 +6,7 @@ example:
 FIRST_NAME=Serge
 echo ${FIRSTNAME}  this will display the value of the variable 
 
-a= "My name is Agnes"
+a= "My name is tina"
 
 Read statement 
 it is used in scripting to capture data from users. the data here is stored in variables and we can call those variables.
